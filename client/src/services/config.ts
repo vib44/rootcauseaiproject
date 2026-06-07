@@ -1,1 +1,1 @@
-export const API_BASE_URL="http://localhost:5000"
+export const API_BASE_URL="https://rootcauseaibackend-3ihy8w4j9-vib44s-projects.vercel.app/"
