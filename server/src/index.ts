@@ -47,6 +47,14 @@ app.use((req, res) => {
 });
 
 
+app.use((err: any, req: any, res: any, next: any) => {
+  console.error("Unhandled error:", err);
+
+  res.status(err.status || 500).json({
+    error: err.message || "Internal Server Error",
+  });
+});
+
 app.listen(process.env.PORT || 8001,()=>
 {
     console.log("Server started...")
