@@ -4,7 +4,7 @@ import connectDb from "../config/dbConfig.js";
 import dotenv from "dotenv";
 import analyze from "./routes/analyze.js"
 import saveMetrics from "./routes/saveMetrics.js"
-import rateLimit from "express-rate-limit"
+import {rateLimit} from "express-rate-limit"
 import path from "path";
 import { fileURLToPath } from "url";
 
