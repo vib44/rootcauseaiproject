@@ -1,219 +1,179 @@
-# AI 
-## Problem statements
+﻿# RootCause AI
 
-All solutions must leverage the Microsoft AI stack(Azure AI, Foundry, GitHub Copilot, AI/ML, Power Platform, etc.)
-* AI Meets Data: From Noise to Insight
-* AI-Powered Production Function 
-* Agent swarms Autonomous browser agents
-* Pure AI security frameworks
-* AI at Work
+RootCause AI is an AI-assisted log triage and root cause analysis platform that helps teams turn noisy operational logs into actionable incident insights. Users can paste log text, upload log files, and receive structured analysis including summary, severity, suggested remediation, and incident frequency.
 
-## DESIGN AND ARCHITECTURE
-Logs uploaded
-      ↓
-Backend processing
-      ↓
-Azure OpenAI analyzes incidents
-      ↓
-AI returns:
-- summary
-- severity
-- probable root cause
-- suggested remediation
-      ↓
-Dashboard displays insights
+Application Web Link : https://rootcauseai-dusky.vercel.app/
 
-## Frontend
-React+Vite
-Tailwind
-## Backend
-Node.js
-Express
-TypeScript
-DB
-MongoDB
-## Cache
-Redis (optional initially)
-## AI
-Azure OpenAI
+## Features
 
-## Set Up
+- Upload log files or paste log content directly into the interface
+- Normalize raw log lines into a consistent structure with timestamp, level, source, and message
+- Group related incidents to reduce duplicate noise
+- Use Azure OpenAI to generate concise summaries, severity ratings, and remediation guidance
+- View results in a dashboard with metrics and incident details
+- Persist analysis metrics in MongoDB for later review
 
-// Fast modern light weight react setup 
-npm create vite@latest 
+## Tech Stack
 
-### Folder structure
+- Frontend: React, TypeScript, Vite, Tailwind CSS, shadcn/ui
+- Backend: Node.js, Express, TypeScript
+- AI: Azure OpenAI via the OpenAI SDK
+- Data: MongoDB
+- File handling: Multer
+- Deployment Frontend: Vercel
+- Deployment Backend: Railway
+
+## Architecture
+
+The application follows a simple three-layer flow:
+
+```mermaid
+flowchart LR
+    A[User uploads or pastes logs] --> B[React dashboard]
+    B --> C[Express API]
+    C --> D[Log normalization and grouping]
+    D --> E[Azure OpenAI analysis]
+    E --> F[Dashboard results and incident insights]
+    C --> G[(MongoDB metrics)]
+```
+
+### How it works
+
+1. The client sends log input to the backend.
+2. The server normalizes the logs and groups repeated incidents.
+3. Azure OpenAI analyzes the grouped content and returns structured output.
+4. The dashboard displays the analysis and incident breakdown.
+
+## Project Structure
+
+```text
 project-root/
-│
-├── client/
-│
-├── server/
-│
-└── README.md
+├── client/                # React + Vite frontend
+├── server/                # Express + TypeScript backend
+├── README.md
+└── project.md             # Project notes and planning
+```
 
-### STEP 1 — Create frontend
-In root folder
-npm create vite@latest client
+## Look and Feel
 
-Choose:
+![alt text](image.png)
 
-React
-TypeScript
+## Prerequisites
 
-Then:
+- Node.js 18 or newer
+- npm
+- An Azure OpenAI resource and deployment
+- A MongoDB instance such as MongoDB Atlas
 
+## Installation
+
+### 1. Clone the repository
+
+```bash
+git clone <your-repo-url>
+cd "MSFT Build AI"
+```
+
+### 2. Install frontend dependencies
+
+```bash
 cd client
 npm install
+```
 
-### STEP 2 — Install Tailwind
+### 3. Install backend dependencies
 
-Use official docs:
-Tailwind CSS Docs
+```bash
+cd ../server
+npm install
+```
 
-Commands:
+### 4. Configure environment variables
 
-npm install tailwindcss @tailwindcss/vite
+Create a `.env` file in the server directory with the following values:
 
-Update vite.config.ts.
+```env
+PORT=8001
+AZURE_OPENAI_ENDPOINT=https://<your-resource>.openai.azure.com/
+AZURE_OPENAI_API_KEY=<your-api-key>
+AZURE_DEPLOYMENT_NAME=<your-model-deployment>
+MONGODB_URI=mongodb://localhost:27017/rootcauseai
+```
 
-Add Tailwind import to CSS.
+If you want to point the frontend at a different backend URL, update [client/src/services/config.ts](client/src/services/config.ts).
 
-### STEP 3 — Create backend
+### 5. Start the development servers
 
-From root:
+Run the backend:
 
-mkdir server
-
+```bash
 cd server
+npm run dev
+```
 
-npm init -y
+Run the frontend in a second terminal:
 
-<!-- npm init is the command used to create a new NPM project. 
-Used for- creating package.json, dependency management, defining scripts, standardized scaffolding 
+```bash
+cd client
+npm run dev
+```
 
-When you run this command, NPM will prompt you to provide some information about your project, such as its name, version, description, main file, test command, Git repository, keywords, author, and license. These details are then used to create a package.
--->
+The frontend will be available at the Vite local address and the backend at `http://localhost:8001`.
 
-**Install dependencies:**
+## API Endpoints
 
-npm install express cors dotenv mongoose openai
+### Health check
 
-**Dev dependencies:**
+- GET `/health`
+- Returns: `Server running`
 
-npm install -D typescript ts-node-dev @types/node @types/express
+### Analyze logs
 
-<!--
-* typescript : typescript compiler
-* ts-node-dev: a development server runner for typescript(like nodemon+ts-node
-so during development-
-save file
-    ↓
-server restarts automatically
-* types/node: This provides TypeScript type definitions for Node.js APIs.
-* types/express: Provides TypeScript typings for Express.
-)>-->
-**Initialize TypeScript:**
-<!-- configures ts compiler and creates/initializes tsconfig.json-->
-npx tsc --init
-### STEP 4 — Basic backend setup
+- POST `/logs/analyze`
+- Request body:
 
-Create:
-
-server/
-│
-├── src/
-│   ├── index.ts
-│   ├── routes/
-│   ├── controllers/
-│   └── services/
-|   └── models/
-│
-├── .env
-└── tsconfig.json
-### STEP 5 — First Express server
-
-Create index.ts 
-
-Run:
-
-npx ts-node-dev src/index.ts
-
-** make sure few things for better TS-Node.js support :**
-
-__package.json__
-      "type": "module"
-      "scripts":{
-            "dev": "tsx watch src/index.ts"
-      } <!-- to enable npm run dev -->
-
-__tsconfig.json__
-
-      "module": "NodeNext",
-      "moduleResolution": "NodeNext",
-      "esModuleInterop": true,
-
-### STEP 6 — MongoDB
-
-Simplest option:
-
-MongoDB Atlas free tier
-
-MongoDB Atlas
-
-Just:
-
-create cluster
-get connection string
-connect via mongoose
-
-Do NOT optimize schema yet.
-
-### STEP 7 — Azure OpenAI
-
-Azure account
-Azure OpenAI resource
-API key
-endpoint
-Explore and Deploy: Deploy a model
-
-Then install OpenAI SDK.
-
-Minimal AI flow
-
-Create endpoint:
-<!-- to compile and debug the ts code in node-->
-npx ts-node logAnalyzer.ts 
-
-
-POST /analyze
-
-Request:
-
+```json
 {
-  "logs": "Database connection timeout..."
+  "logs": "ERROR: Database connection timed out"
 }
+```
 
-Response:
+- Response:
 
+```json
 {
-  "summary": "...",
-  "severity": "High",
-  "suggestedFix": "..."
+  "summary": "Database connection timeouts are occurring intermittently",
+  "severity": "high",
+  "suggestedFix": "Check database connectivity and retry logic",
+  "frequency": 3
 }
-IMPORTANT:
+```
 
-### STEP 8 — Frontend connection
+### Upload a log file
 
-dependencies needed: tailwind css, axios, react
+- POST `/logs/upload`
+- Accepts a multipart form upload with the field `upload_file`
+- Returns uploaded file metadata and file contents
+
+### Save metrics
+
+- POST `/logs/savemetrics`
+- Stores analysis-related metrics in MongoDB
+
+## Screenshots
+
+Screenshots will be added here as the UI evolves. Planned visuals include:
+
+- The main dashboard with incident metrics
+- The log upload and analysis workflow
+- The AI-generated root cause result card
+
+## Future Improvements
+
+- Integrate with Azure Monitor, CloudWatch, and other observability platforms
+- Add authentication and role-based access control
+- Improve incident deduplication and clustering accuracy
+- Add persistent history and report export
+- Introduce batch processing for large log volumes
 
 
-### STEP 9 - Create MVP
-
-ingestion - text area, file upload
-routes - limited analyze route for analyzing the text area string via openai
-
-module required - 
-
-server/ npm i multer
-<!-- install type script dev dependency for project to utilize multer-->
-server/ nmp i --save -dev @type/multer 
